@@ -61,8 +61,7 @@ public class AjaxResult extends HashMap<String, Object>
      */
     public AjaxResult(Type type, String msg)
     {
-        super.put(CODE_TAG, type.value);
-        super.put(MSG_TAG, msg);
+        this(type, msg, null);
     }
 
     /**
@@ -89,7 +88,7 @@ public class AjaxResult extends HashMap<String, Object>
      */
     public static AjaxResult success()
     {
-        return AjaxResult.success("操作成功");
+        return restResult(Type.SUCCESS, "操作成功", null);
     }
 
     /**
@@ -99,7 +98,7 @@ public class AjaxResult extends HashMap<String, Object>
      */
     public static AjaxResult success(Object data)
     {
-        return AjaxResult.success("操作成功", data);
+        return restResult(Type.SUCCESS, "操作成功", data);
     }
 
     /**
@@ -110,7 +109,7 @@ public class AjaxResult extends HashMap<String, Object>
      */
     public static AjaxResult success(String msg)
     {
-        return AjaxResult.success(msg, null);
+        return restResult(Type.SUCCESS, msg, null);
     }
 
     /**
@@ -122,7 +121,7 @@ public class AjaxResult extends HashMap<String, Object>
      */
     public static AjaxResult success(String msg, Object data)
     {
-        return new AjaxResult(Type.SUCCESS, msg, data);
+        return restResult(Type.SUCCESS, msg, data);
     }
 
     /**
@@ -133,7 +132,7 @@ public class AjaxResult extends HashMap<String, Object>
      */
     public static AjaxResult warn(String msg)
     {
-        return AjaxResult.warn(msg, null);
+        return restResult(Type.WARN, msg, null);
     }
 
     /**
@@ -145,7 +144,7 @@ public class AjaxResult extends HashMap<String, Object>
      */
     public static AjaxResult warn(String msg, Object data)
     {
-        return new AjaxResult(Type.WARN, msg, data);
+        return restResult(Type.WARN, msg, data);
     }
 
     /**
@@ -155,7 +154,7 @@ public class AjaxResult extends HashMap<String, Object>
      */
     public static AjaxResult error()
     {
-        return AjaxResult.error("操作失败");
+        return restResult(Type.ERROR, "操作失败", null);
     }
 
     /**
@@ -166,7 +165,7 @@ public class AjaxResult extends HashMap<String, Object>
      */
     public static AjaxResult error(String msg)
     {
-        return AjaxResult.error(msg, null);
+        return restResult(Type.ERROR, msg, null);
     }
 
     /**
@@ -178,7 +177,20 @@ public class AjaxResult extends HashMap<String, Object>
      */
     public static AjaxResult error(String msg, Object data)
     {
-        return new AjaxResult(Type.ERROR, msg, data);
+        return restResult(Type.ERROR, msg, data);
+    }
+
+    /**
+     * 响应返回结果
+     * 
+     * @param type 状态类型
+     * @param msg 返回内容
+     * @param data 数据对象
+     * @return 结果
+     */
+    private static AjaxResult restResult(Type type, String msg, Object data)
+    {
+        return new AjaxResult(type, msg, data);
     }
 
     /**
