@@ -6,7 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * 获取IP方法
- * 
+ *
  * @author ruoyi
  */
 public class IpUtils
@@ -20,7 +20,7 @@ public class IpUtils
 
     /**
      * 获取客户端IP
-     * 
+     *
      * @param request 请求对象
      * @return IP地址
      */
@@ -58,7 +58,7 @@ public class IpUtils
 
     /**
      * 检查是否为内部IP地址
-     * 
+     *
      * @param ip IP地址
      * @return 结果
      */
@@ -70,7 +70,7 @@ public class IpUtils
 
     /**
      * 检查是否为内部IP地址
-     * 
+     *
      * @param addr byte地址
      * @return 结果
      */
@@ -113,7 +113,7 @@ public class IpUtils
 
     /**
      * 将IPv4地址转换成字节
-     * 
+     *
      * @param text IPv4地址
      * @return byte 字节
      */
@@ -201,7 +201,7 @@ public class IpUtils
 
     /**
      * 获取IP地址
-     * 
+     *
      * @return 本地IP地址
      */
     public static String getHostIp()
@@ -218,7 +218,7 @@ public class IpUtils
 
     /**
      * 获取主机名
-     * 
+     *
      * @return 本地主机名
      */
     public static String getHostName()
@@ -241,7 +241,6 @@ public class IpUtils
      */
     public static String getMultistageReverseProxyIp(String ip)
     {
-        // 多级反向代理检测
         if (ip != null && ip.indexOf(",") > 0)
         {
             final String[] ips = ip.trim().split(",");
@@ -304,7 +303,7 @@ public class IpUtils
     }
 
     /**
-     * 是否为特定格式如:“10.10.10.1-10.10.10.99”的ip段字符串
+     * 是否为特定格式如:"10.10.10.1-10.10.10.99"的ip段字符串
      */
     public static boolean isIPSegment(String ipSeg)
     {
@@ -338,7 +337,7 @@ public class IpUtils
 
     /**
      * 校验ip是否符合过滤串规则
-     * 
+     *
      * @param filter 过滤IP列表,支持后缀'*'通配,支持网段如:`10.10.10.1-10.10.10.99`
      * @param ip 校验IP地址
      * @return boolean 结果
@@ -366,5 +365,104 @@ public class IpUtils
             }
         }
         return false;
+    }
+
+    public static void main(String[] args)
+    {
+        int passed = 0, failed = 0;
+        System.out.println("========== IpUtils Lightweight Test ==========\n");
+
+        passed += testCase("IPv4 normal", getIpAddr(createMockRequest(null, null, "192.168.1.100")), "192.168.1.100") ? 1 : (failed++, 0);
+        passed += testCase("IPv4 localhost", getIpAddr(createMockRequest(null, null, "127.0.0.1")), "127.0.0.1") ? 1 : (failed++, 0);
+        passed += testCase("IPv6 localhost expanded", getIpAddr(createMockRequest(null, null, "0:0:0:0:0:0:0:1")), "127.0.0.1") ? 1 : (failed++, 0);
+        passed += testCase("IPv6 compressed loopback", getIpAddr(createMockRequest(null, null, "::1")), "127.0.0.1") ? 1 : (failed++, 0);
+        passed += testCase("IPv6 full compressed", getIpAddr(createMockRequest(null, null, "::")), "127.0.0.1") ? 1 : (failed++, 0);
+        passed += testCase("X-Forwarded-For single", getIpAddr(createMockRequest("X-Forwarded-For", null, "10.0.0.1")), "10.0.0.1") ? 1 : (failed++, 0);
+        passed += testCase("X-Forwarded-For multi-level proxy", getIpAddr(createMockRequest("X-Forwarded-For", null, "192.168.1.1, 10.0.0.1, 172.16.0.1")), "192.168.1.1") ? 1 : (failed++, 0);
+        passed += testCase("X-Forwarded-For with unknown", getIpAddr(createMockRequest("X-Forwarded-For", null, "unknown, 10.0.0.1, unknown")), "10.0.0.1") ? 1 : (failed++, 0);
+        passed += testCase("Proxy-Client-IP header", getIpAddr(createMockRequest(null, "Proxy-Client-IP", "10.10.10.10")), "10.10.10.10") ? 1 : (failed++, 0);
+        passed += testCase("Internal IP 10.x.x.x", internalIp("10.255.255.255"), true) ? 1 : (failed++, 0);
+        passed += testCase("Internal IP 172.16.x.x", internalIp("172.16.0.1"), true) ? 1 : (failed++, 0);
+        passed += testCase("Internal IP 192.168.x.x", internalIp("192.168.0.1"), true) ? 1 : (failed++, 0);
+        passed += testCase("External IP", internalIp("8.8.8.8"), false) ? 1 : (failed++, 0);
+        passed += testCase("Invalid IP format", textToNumericFormatV4("invalid"), null) ? 1 : (failed++, 0);
+        passed += testCase("Out-of-range octet", textToNumericFormatV4("256.0.0.1"), null) ? 1 : (failed++, 0);
+        passed += testCase("IPv6 invalid format", textToNumericFormatV4("2001:db8::gggg"), null) ? 1 : (failed++, 0);
+        passed += testCase("Valid IPv4 bytes conversion", textToNumericFormatV4("192.168.1.1") != null, true) ? 1 : (failed++, 0);
+        passed += testCase("isIP valid", isIP("192.168.1.1"), true) ? 1 : (failed++, 0);
+        passed += testCase("isIP invalid", isIP("999.999.999.999"), false) ? 1 : (failed++, 0);
+        passed += testCase("isMatchedIp single", isMatchedIp("192.168.1.1", "192.168.1.1"), true) ? 1 : (failed++, 0);
+        passed += testCase("isMatchedIp wildcard", isMatchedIp("192.168.*.*", "192.168.5.5"), true) ? 1 : (failed++, 0);
+        passed += testCase("isMatchedIp segment", isMatchedIp("192.168.1.1-192.168.1.10", "192.168.1.5"), true) ? 1 : (failed++, 0);
+
+        System.out.println("\n========== Test Summary ==========");
+        System.out.printf("Passed: %d | Failed: %d | Total: %d%n", passed, failed, passed + failed);
+        System.out.println(failed == 0 ? "ALL TESTS PASSED" : "SOME TESTS FAILED");
+        System.out.println("==================================");
+    }
+
+    private static boolean testCase(String name, String actual, String expected)
+    {
+        boolean pass = expected.equals(actual);
+        System.out.printf("[%s] %s: expected=[%s], actual=[%s] %s%n",
+                pass ? "PASS" : "FAIL", name, expected, actual, pass ? "" : "❌");
+        return pass;
+    }
+
+    private static boolean testCase(String name, boolean actual, boolean expected)
+    {
+        boolean pass = expected == actual;
+        System.out.printf("[%s] %s: expected=[%s], actual=[%s] %s%n",
+                pass ? "PASS" : "FAIL", name, expected, actual, pass ? "" : "❌");
+        return pass;
+    }
+
+    private static Object createMockRequest(String headerName, String altHeaderName, String ipValue)
+    {
+        return new MockHttpServletRequestWrapper(headerName, altHeaderName, ipValue);
+    }
+
+    private static class MockHttpServletRequestWrapper
+    {
+        private final String headerValue;
+        private final String altHeaderValue;
+        private String remoteAddr;
+
+        MockHttpServletRequestWrapper(String headerName, String altHeaderName, String ipValue)
+        {
+            if ("X-Forwarded-For".equals(headerName))
+            {
+                this.headerValue = ipValue;
+                this.altHeaderValue = null;
+                this.remoteAddr = "127.0.0.1";
+            }
+            else if ("Proxy-Client-IP".equals(altHeaderName))
+            {
+                this.headerValue = null;
+                this.altHeaderValue = ipValue;
+                this.remoteAddr = "127.0.0.1";
+            }
+            else
+            {
+                this.headerValue = null;
+                this.altHeaderValue = null;
+                this.remoteAddr = ipValue;
+            }
+        }
+
+        public String getHeader(String name)
+        {
+            if ("x-forwarded-for".equalsIgnoreCase(name)) return headerValue;
+            if ("X-Forwarded-For".equalsIgnoreCase(name)) return headerValue;
+            if ("Proxy-Client-IP".equalsIgnoreCase(name)) return altHeaderValue;
+            if ("WL-Proxy-Client-IP".equalsIgnoreCase(name)) return null;
+            if ("X-Real-IP".equalsIgnoreCase(name)) return null;
+            return null;
+        }
+
+        public String getRemoteAddr()
+        {
+            return remoteAddr;
+        }
     }
 }
