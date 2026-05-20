@@ -1,0 +1,81 @@
+diff --git a/ruoyi-system/src/main/java/com/ruoyi/system/service/impl/SysMenuServiceImpl.java b/ruoyi-system/src/main/java/com/ruoyi/system/service/impl/SysMenuServiceImpl.java
+index e5febd4f..70274889 100644
+--- a/ruoyi-system/src/main/java/com/ruoyi/system/service/impl/SysMenuServiceImpl.java
++++ b/ruoyi-system/src/main/java/com/ruoyi/system/service/impl/SysMenuServiceImpl.java
+@@ -385,7 +385,7 @@ public class SysMenuServiceImpl implements ISysMenuService
+             // 一、根据传入的某个父节点ID,遍历该父节点的所有子节点
+             if (t.getParentId() == parentId)
+             {
+-                recursionFn(list, t);
++                recursionFn(list, t, new HashSet<Long>());
+                 returnList.add(t);
+             }
+         }
+@@ -395,19 +395,20 @@ public class SysMenuServiceImpl implements ISysMenuService
+     /**
+      * 递归列表
+      * 
+-     * @param list
+-     * @param t
++     * @param list 菜单列表
++     * @param t 当前菜单
++     * @param ancestorMenuIds 当前递归路径上的菜单ID集合
+      */
+-    private void recursionFn(List<SysMenu> list, SysMenu t)
++    private void recursionFn(List<SysMenu> list, SysMenu t, Set<Long> ancestorMenuIds)
+     {
+-        // 得到子节点列表
+-        List<SysMenu> childList = getChildList(list, t);
++        ancestorMenuIds.add(t.getMenuId());
++        List<SysMenu> childList = getChildList(list, t, ancestorMenuIds);
+         t.setChildren(childList);
+         for (SysMenu tChild : childList)
+         {
+-            if (hasChild(list, tChild))
++            if (hasChild(list, tChild, ancestorMenuIds))
+             {
+-                recursionFn(list, tChild);
++                recursionFn(list, tChild, new HashSet<Long>(ancestorMenuIds));
+             }
+         }
+     }
+@@ -415,7 +416,7 @@ public class SysMenuServiceImpl implements ISysMenuService
+     /**
+      * 得到子节点列表
+      */
+-    private List<SysMenu> getChildList(List<SysMenu> list, SysMenu t)
++    private List<SysMenu> getChildList(List<SysMenu> list, SysMenu t, Set<Long> ancestorMenuIds)
+     {
+         List<SysMenu> tlist = new ArrayList<SysMenu>();
+         Iterator<SysMenu> it = list.iterator();
+@@ -424,6 +425,11 @@ public class SysMenuServiceImpl implements ISysMenuService
+             SysMenu n = (SysMenu) it.next();
+             if (n.getParentId().longValue() == t.getMenuId().longValue())
+             {
++                // 访问链保存的是当前递归路径上的祖先菜单ID，若子节点已存在于访问链中，说明父菜单回指到了祖先节点，这里直接跳过以中断循环引用。
++                if (isMenuInAncestorChain(n, ancestorMenuIds))
++                {
++                    continue;
++                }
+                 tlist.add(n);
+             }
+         }
+@@ -433,8 +439,16 @@ public class SysMenuServiceImpl implements ISysMenuService
+     /**
+      * 判断是否有子节点
+      */
+-    private boolean hasChild(List<SysMenu> list, SysMenu t)
++    private boolean hasChild(List<SysMenu> list, SysMenu t, Set<Long> ancestorMenuIds)
+     {
+-        return getChildList(list, t).size() > 0;
++        return getChildList(list, t, ancestorMenuIds).size() > 0;
++    }
++
++    /**
++     * 判断菜单是否已经出现在当前访问链中
++     */
++    private boolean isMenuInAncestorChain(SysMenu menu, Set<Long> ancestorMenuIds)
++    {
++        return StringUtils.isNotNull(menu.getMenuId()) && ancestorMenuIds.contains(menu.getMenuId());
+     }
+ }
