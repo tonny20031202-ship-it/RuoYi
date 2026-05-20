@@ -1,0 +1,47 @@
+diff --git a/ruoyi-system/src/main/java/com/ruoyi/system/service/impl/SysMenuServiceImpl.java b/ruoyi-system/src/main/java/com/ruoyi/system/service/impl/SysMenuServiceImpl.java
+index e5febd4f..9c0f4130 100644
+--- a/ruoyi-system/src/main/java/com/ruoyi/system/service/impl/SysMenuServiceImpl.java
++++ b/ruoyi-system/src/main/java/com/ruoyi/system/service/impl/SysMenuServiceImpl.java
+@@ -379,13 +379,13 @@ public class SysMenuServiceImpl implements ISysMenuService
+     public List<SysMenu> getChildPerms(List<SysMenu> list, int parentId)
+     {
+         List<SysMenu> returnList = new ArrayList<SysMenu>();
++        Set<Long> visitedPath = new HashSet<Long>();
+         for (Iterator<SysMenu> iterator = list.iterator(); iterator.hasNext();)
+         {
+             SysMenu t = (SysMenu) iterator.next();
+-            // 一、根据传入的某个父节点ID,遍历该父节点的所有子节点
+             if (t.getParentId() == parentId)
+             {
+-                recursionFn(list, t);
++                recursionFn(list, t, visitedPath);
+                 returnList.add(t);
+             }
+         }
+@@ -395,19 +395,20 @@ public class SysMenuServiceImpl implements ISysMenuService
+     /**
+      * 递归列表
+      * 
+-     * @param list
+-     * @param t
++     * @param list 菜单列表
++     * @param t 当前节点
++     * @param visitedPath 已访问节点的ID集合，用于检测循环引用
+      */
+-    private void recursionFn(List<SysMenu> list, SysMenu t)
++    private void recursionFn(List<SysMenu> list, SysMenu t, Set<Long> visitedPath)
+     {
+-        // 得到子节点列表
++        visitedPath.add(t.getMenuId());
+         List<SysMenu> childList = getChildList(list, t);
+         t.setChildren(childList);
+         for (SysMenu tChild : childList)
+         {
+-            if (hasChild(list, tChild))
++            if (!visitedPath.contains(tChild.getMenuId()) && hasChild(list, tChild))
+             {
+-                recursionFn(list, tChild);
++                recursionFn(list, tChild, visitedPath);
+             }
+         }
+     }
