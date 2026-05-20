@@ -9,6 +9,11 @@ import com.ruoyi.common.utils.StringUtils;
  */
 public class PageDomain
 {
+    private static final int DEFAULT_PAGE_NUM = 1;
+    private static final int DEFAULT_PAGE_SIZE = 10;
+    private static final int MAX_PAGE_SIZE = 500;
+    private static final String ORDER_BY_PATTERN = "[a-zA-Z0-9_\\ \\,\\.]+";
+
     /** 当前记录起始索引 */
     private Integer pageNum;
 
@@ -30,11 +35,20 @@ public class PageDomain
         {
             return "";
         }
-        return StringUtils.toUnderScoreCase(orderByColumn) + " " + isAsc;
+        String column = StringUtils.toUnderScoreCase(orderByColumn);
+        if (!column.matches(ORDER_BY_PATTERN))
+        {
+            return "";
+        }
+        return column + " " + getIsAsc();
     }
 
     public Integer getPageNum()
     {
+        if (pageNum == null || pageNum < 1)
+        {
+            return DEFAULT_PAGE_NUM;
+        }
         return pageNum;
     }
 
@@ -45,6 +59,14 @@ public class PageDomain
 
     public Integer getPageSize()
     {
+        if (pageSize == null || pageSize < 1)
+        {
+            return DEFAULT_PAGE_SIZE;
+        }
+        if (pageSize > MAX_PAGE_SIZE)
+        {
+            return MAX_PAGE_SIZE;
+        }
         return pageSize;
     }
 
@@ -65,7 +87,11 @@ public class PageDomain
 
     public String getIsAsc()
     {
-        return isAsc;
+        if (StringUtils.isEmpty(isAsc) || !"desc".equalsIgnoreCase(isAsc))
+        {
+            return "asc";
+        }
+        return "desc";
     }
 
     public void setIsAsc(String isAsc)
