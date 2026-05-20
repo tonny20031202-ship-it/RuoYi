@@ -1,0 +1,47 @@
+diff --git a/ruoyi-system/src/main/java/com/ruoyi/system/service/impl/SysMenuServiceImpl.java b/ruoyi-system/src/main/java/com/ruoyi/system/service/impl/SysMenuServiceImpl.java
+index e5febd4f..49240f3d 100644
+--- a/ruoyi-system/src/main/java/com/ruoyi/system/service/impl/SysMenuServiceImpl.java
++++ b/ruoyi-system/src/main/java/com/ruoyi/system/service/impl/SysMenuServiceImpl.java
+@@ -385,7 +385,7 @@ public class SysMenuServiceImpl implements ISysMenuService
+             // 一、根据传入的某个父节点ID,遍历该父节点的所有子节点
+             if (t.getParentId() == parentId)
+             {
+-                recursionFn(list, t);
++                recursionFn(list, t, new HashSet<Long>());
+                 returnList.add(t);
+             }
+         }
+@@ -395,11 +395,19 @@ public class SysMenuServiceImpl implements ISysMenuService
+     /**
+      * 递归列表
+      * 
+-     * @param list
+-     * @param t
++     * @param list 菜单列表
++     * @param t 当前菜单节点
++     * @param visitedIds 已访问过的菜单ID集合，用于检测循环引用
+      */
+-    private void recursionFn(List<SysMenu> list, SysMenu t)
++    private void recursionFn(List<SysMenu> list, SysMenu t, Set<Long> visitedIds)
+     {
++        // 检测当前节点是否已在访问链中，若是则说明出现了循环引用，直接返回避免无限递归
++        if (visitedIds.contains(t.getMenuId()))
++        {
++            return;
++        }
++        // 将当前节点ID添加到访问链中，进入下一层递归前标记已访问
++        visitedIds.add(t.getMenuId());
+         // 得到子节点列表
+         List<SysMenu> childList = getChildList(list, t);
+         t.setChildren(childList);
+@@ -407,7 +415,9 @@ public class SysMenuServiceImpl implements ISysMenuService
+         {
+             if (hasChild(list, tChild))
+             {
+-                recursionFn(list, tChild);
++                // 创建新的访问链集合，用于下一层递归（避免不同分支间相互影响）
++                Set<Long> childVisitedIds = new HashSet<>(visitedIds);
++                recursionFn(list, tChild, childVisitedIds);
+             }
+         }
+     }
