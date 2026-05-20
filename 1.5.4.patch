@@ -1,0 +1,113 @@
+diff --git a/ruoyi-common/src/main/java/com/ruoyi/common/core/page/PageDomain.java b/ruoyi-common/src/main/java/com/ruoyi/common/core/page/PageDomain.java
+index 975c465b..904ce15f 100644
+--- a/ruoyi-common/src/main/java/com/ruoyi/common/core/page/PageDomain.java
++++ b/ruoyi-common/src/main/java/com/ruoyi/common/core/page/PageDomain.java
+@@ -24,6 +24,15 @@ public class PageDomain
+     /** 分页参数合理化 */
+     private Boolean reasonable = true;
+ 
++    /** 每页显示记录数的最小值 */
++    private static final int MIN_PAGE_SIZE = 1;
++
++    /** 每页显示记录数的最大值 */
++    private static final int MAX_PAGE_SIZE = 1000;
++
++    /** 排序字段仅支持字母、数字、下划线、空格、逗号、小数点（支持多个字段排序） */
++    private static final String ORDER_BY_COLUMN_PATTERN = "[a-zA-Z0-9_\\ \\,\\.]+";
++
+     public String getOrderBy()
+     {
+         if (StringUtils.isEmpty(orderByColumn))
+@@ -40,7 +49,14 @@ public class PageDomain
+ 
+     public void setPageNum(Integer pageNum)
+     {
+-        this.pageNum = pageNum;
++        if (pageNum == null || pageNum < 1)
++        {
++            this.pageNum = 1;
++        }
++        else
++        {
++            this.pageNum = pageNum;
++        }
+     }
+ 
+     public Integer getPageSize()
+@@ -50,7 +66,22 @@ public class PageDomain
+ 
+     public void setPageSize(Integer pageSize)
+     {
+-        this.pageSize = pageSize;
++        if (pageSize == null)
++        {
++            this.pageSize = 10;
++        }
++        else if (pageSize < MIN_PAGE_SIZE)
++        {
++            this.pageSize = MIN_PAGE_SIZE;
++        }
++        else if (pageSize > MAX_PAGE_SIZE)
++        {
++            this.pageSize = MAX_PAGE_SIZE;
++        }
++        else
++        {
++            this.pageSize = pageSize;
++        }
+     }
+ 
+     public String getOrderByColumn()
+@@ -60,7 +91,14 @@ public class PageDomain
+ 
+     public void setOrderByColumn(String orderByColumn)
+     {
+-        this.orderByColumn = orderByColumn;
++        if (StringUtils.isNotEmpty(orderByColumn) && isValidOrderByColumn(orderByColumn))
++        {
++            this.orderByColumn = orderByColumn;
++        }
++        else
++        {
++            this.orderByColumn = null;
++        }
+     }
+ 
+     public String getIsAsc()
+@@ -70,7 +108,22 @@ public class PageDomain
+ 
+     public void setIsAsc(String isAsc)
+     {
+-        this.isAsc = isAsc;
++        if (StringUtils.isNotEmpty(isAsc))
++        {
++            String lowerCaseAsc = isAsc.trim().toLowerCase();
++            if ("asc".equals(lowerCaseAsc) || "desc".equals(lowerCaseAsc))
++            {
++                this.isAsc = lowerCaseAsc;
++            }
++            else
++            {
++                this.isAsc = "asc";
++            }
++        }
++        else
++        {
++            this.isAsc = "asc";
++        }
+     }
+ 
+     public Boolean getReasonable()
+@@ -86,4 +139,12 @@ public class PageDomain
+     {
+         this.reasonable = reasonable;
+     }
++
++    /**
++     * 验证排序列是否合法
++     */
++    private boolean isValidOrderByColumn(String value)
++    {
++        return value.matches(ORDER_BY_COLUMN_PATTERN);
++    }
+ }
