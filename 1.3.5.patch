@@ -1,0 +1,52 @@
+diff --git a/ruoyi-common/src/main/java/com/ruoyi/common/core/domain/AjaxResult.java b/ruoyi-common/src/main/java/com/ruoyi/common/core/domain/AjaxResult.java
+index 1f59cbcb..cd74ec27 100644
+--- a/ruoyi-common/src/main/java/com/ruoyi/common/core/domain/AjaxResult.java
++++ b/ruoyi-common/src/main/java/com/ruoyi/common/core/domain/AjaxResult.java
+@@ -74,14 +74,18 @@ public class AjaxResult extends HashMap<String, Object>
+      */
+     public AjaxResult(Type type, String msg, Object data)
+     {
+-        super.put(CODE_TAG, type.value);
+-        super.put(MSG_TAG, msg);
++        this(type, msg);
+         if (StringUtils.isNotNull(data))
+         {
+             super.put(DATA_TAG, data);
+         }
+     }
+ 
++    private static AjaxResult build(Type type, String msg, Object data)
++    {
++        return new AjaxResult(type, msg, data);
++    }
++
+     /**
+      * 返回成功消息
+      *
+@@ -122,7 +126,7 @@ public class AjaxResult extends HashMap<String, Object>
+      */
+     public static AjaxResult success(String msg, Object data)
+     {
+-        return new AjaxResult(Type.SUCCESS, msg, data);
++        return build(Type.SUCCESS, msg, data);
+     }
+ 
+     /**
+@@ -145,7 +149,7 @@ public class AjaxResult extends HashMap<String, Object>
+      */
+     public static AjaxResult warn(String msg, Object data)
+     {
+-        return new AjaxResult(Type.WARN, msg, data);
++        return build(Type.WARN, msg, data);
+     }
+ 
+     /**
+@@ -178,7 +182,7 @@ public class AjaxResult extends HashMap<String, Object>
+      */
+     public static AjaxResult error(String msg, Object data)
+     {
+-        return new AjaxResult(Type.ERROR, msg, data);
++        return build(Type.ERROR, msg, data);
+     }
+ 
+     /**

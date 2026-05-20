@@ -74,12 +74,16 @@ public class AjaxResult extends HashMap<String, Object>
      */
     public AjaxResult(Type type, String msg, Object data)
     {
-        super.put(CODE_TAG, type.value);
-        super.put(MSG_TAG, msg);
+        this(type, msg);
         if (StringUtils.isNotNull(data))
         {
             super.put(DATA_TAG, data);
         }
+    }
+
+    private static AjaxResult build(Type type, String msg, Object data)
+    {
+        return new AjaxResult(type, msg, data);
     }
 
     /**
@@ -122,7 +126,7 @@ public class AjaxResult extends HashMap<String, Object>
      */
     public static AjaxResult success(String msg, Object data)
     {
-        return new AjaxResult(Type.SUCCESS, msg, data);
+        return build(Type.SUCCESS, msg, data);
     }
 
     /**
@@ -145,7 +149,7 @@ public class AjaxResult extends HashMap<String, Object>
      */
     public static AjaxResult warn(String msg, Object data)
     {
-        return new AjaxResult(Type.WARN, msg, data);
+        return build(Type.WARN, msg, data);
     }
 
     /**
@@ -178,7 +182,7 @@ public class AjaxResult extends HashMap<String, Object>
      */
     public static AjaxResult error(String msg, Object data)
     {
-        return new AjaxResult(Type.ERROR, msg, data);
+        return build(Type.ERROR, msg, data);
     }
 
     /**
