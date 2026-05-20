@@ -859,4 +859,67 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils
         }
         return sb.toString();
     }
+
+    /**
+     * 静态自检方法，用于验证 isEmpty、isNotEmpty、substring、format 在边界输入下的行为
+     */
+    public static void main(String[] args)
+    {
+        int[] stats = {0, 0};
+        
+        java.util.function.BiConsumer<Boolean, String> check = (condition, name) -> {
+            if (condition != null && condition) {
+                stats[0]++;
+                System.out.println("[PASS] " + name);
+            } else {
+                stats[1]++;
+                System.err.println("[FAIL] " + name);
+            }
+        };
+
+        System.out.println("--- StringUtils Boundary Self-Check ---");
+
+        // 1. isEmpty
+        check.accept(isEmpty((String) null), "isEmpty(null)");
+        check.accept(isEmpty(""), "isEmpty(\"\")");
+        check.accept(isEmpty("   "), "isEmpty(\"   \")");
+        check.accept(!isEmpty("a"), "!isEmpty(\"a\")");
+        check.accept(!isEmpty("😊"), "!isEmpty(\"😊\")");
+        check.accept(!isEmpty("中文"), "!isEmpty(\"中文\")");
+
+        // 2. isNotEmpty
+        check.accept(!isNotEmpty((String) null), "!isNotEmpty(null)");
+        check.accept(!isNotEmpty(""), "!isNotEmpty(\"\")");
+        check.accept(!isNotEmpty("   "), "!isNotEmpty(\"   \")");
+        check.accept(isNotEmpty("a"), "isNotEmpty(\"a\")");
+        check.accept(isNotEmpty("😊"), "isNotEmpty(\"😊\")");
+        check.accept(isNotEmpty("中文"), "isNotEmpty(\"中文\")");
+
+        // 3. substring
+        check.accept("".equals(substring(null, 0)), "substring(null, 0)");
+        check.accept("".equals(substring("", 1)), "substring(\"\", 1)");
+        check.accept("".equals(substring("abc", 5)), "substring(\"abc\", 5)");
+        check.accept("bc".equals(substring("abc", -2)), "substring(\"abc\", -2)");
+        check.accept("abc".equals(substring("abc", -5)), "substring(\"abc\", -5)");
+        
+        check.accept("".equals(substring(null, 0, 1)), "substring(null, 0, 1)");
+        check.accept("ab".equals(substring("abc", 0, 2)), "substring(\"abc\", 0, 2)");
+        check.accept("".equals(substring("abc", 2, 1)), "substring(\"abc\", 2, 1)");
+        check.accept("ab".equals(substring("abc", -3, -1)), "substring(\"abc\", -3, -1)");
+        
+        check.accept("文".equals(substring("中文", 1)), "substring(\"中文\", 1)");
+        String emoji = "😊"; 
+        check.accept(emoji.equals(substring(emoji, 0, 2)), "substring emoji full");
+        check.accept(emoji.substring(1).equals(substring(emoji, 1)), "substring emoji multi-byte truncation");
+
+        // 4. format
+        check.accept(format(null, "a") == null, "format(null)");
+        check.accept("a{}".equals(format("a{}")), "format empty params");
+        check.accept("a{}".equals(format("a{}", (Object[]) null)), "format null params");
+        check.accept("中文".equals(format("中{}", "文")), "format Chinese");
+        check.accept("😊".equals(format("{}", "😊")), "format emoji");
+        check.accept("😊".equals(format("{}{}", emoji.substring(0, 1), emoji.substring(1))), "format emoji multi-byte combination");
+
+        System.out.println(String.format("Total: %d, Passed: %d, Failed: %d", stats[0] + stats[1], stats[0], stats[1]));
+    }
 }
