@@ -30,7 +30,12 @@ public class PageDomain
         {
             return "";
         }
-        return StringUtils.toUnderScoreCase(orderByColumn) + " " + isAsc;
+        String orderBy = StringUtils.toUnderScoreCase(orderByColumn);
+        if (!orderBy.matches("^[a-zA-Z0-9_\\ \\,\\.]+$"))
+        {
+            return "";
+        }
+        return orderBy + " " + isAsc;
     }
 
     public Integer getPageNum()
@@ -40,6 +45,10 @@ public class PageDomain
 
     public void setPageNum(Integer pageNum)
     {
+        if (pageNum != null && pageNum < 0)
+        {
+            pageNum = 1;
+        }
         this.pageNum = pageNum;
     }
 
@@ -50,6 +59,10 @@ public class PageDomain
 
     public void setPageSize(Integer pageSize)
     {
+        if (pageSize != null && pageSize < 0)
+        {
+            pageSize = 10;
+        }
         this.pageSize = pageSize;
     }
 
@@ -70,7 +83,23 @@ public class PageDomain
 
     public void setIsAsc(String isAsc)
     {
-        this.isAsc = isAsc;
+        if (StringUtils.isNotEmpty(isAsc))
+        {
+            // 兼容前端排序类型
+            if ("ascending".equals(isAsc))
+            {
+                isAsc = "asc";
+            }
+            else if ("descending".equals(isAsc))
+            {
+                isAsc = "desc";
+            }
+            else if (!"asc".equalsIgnoreCase(isAsc) && !"desc".equalsIgnoreCase(isAsc))
+            {
+                isAsc = "asc";
+            }
+            this.isAsc = isAsc;
+        }
     }
 
     public Boolean getReasonable()
