@@ -1,0 +1,257 @@
+diff --git a/ruoyi-common/src/main/java/com/ruoyi/common/utils/StringUtils.java b/ruoyi-common/src/main/java/com/ruoyi/common/utils/StringUtils.java
+index 7aac7481..ea756a67 100644
+--- a/ruoyi-common/src/main/java/com/ruoyi/common/utils/StringUtils.java
++++ b/ruoyi-common/src/main/java/com/ruoyi/common/utils/StringUtils.java
+@@ -859,4 +859,252 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils
+         }
+         return sb.toString();
+     }
++
++    public static void main(String[] args)
++    {
++        int failedCount = 0;
++        int totalCount = 0;
++
++        System.out.println("==================== StringUtils 自检开始 ====================");
++
++        totalCount++;
++        boolean isEmpty1 = isEmpty(null);
++        if (!isEmpty1)
++        {
++            failedCount++;
++            System.out.println("[FAIL] isEmpty(null) 期望 true，实际 " + isEmpty1);
++        }
++        else
++        {
++            System.out.println("[PASS] isEmpty(null) = " + isEmpty1);
++        }
++
++        totalCount++;
++        boolean isEmpty2 = isEmpty("");
++        if (!isEmpty2)
++        {
++            failedCount++;
++            System.out.println("[FAIL] isEmpty(\"\") 期望 true，实际 " + isEmpty2);
++        }
++        else
++        {
++            System.out.println("[PASS] isEmpty(\"\") = " + isEmpty2);
++        }
++
++        totalCount++;
++        boolean isEmpty3 = isEmpty("   ");
++        if (!isEmpty3)
++        {
++            failedCount++;
++            System.out.println("[FAIL] isEmpty(\"   \") 期望 true，实际 " + isEmpty3);
++        }
++        else
++        {
++            System.out.println("[PASS] isEmpty(\"   \") = " + isEmpty3);
++        }
++
++        totalCount++;
++        boolean isEmpty4 = isEmpty("hello");
++        if (isEmpty4)
++        {
++            failedCount++;
++            System.out.println("[FAIL] isEmpty(\"hello\") 期望 false，实际 " + isEmpty4);
++        }
++        else
++        {
++            System.out.println("[PASS] isEmpty(\"hello\") = " + isEmpty4);
++        }
++
++        totalCount++;
++        boolean isEmpty5 = isEmpty("👋");
++        if (isEmpty5)
++        {
++            failedCount++;
++            System.out.println("[FAIL] isEmpty(\"👋\") 期望 false，实际 " + isEmpty5);
++        }
++        else
++        {
++            System.out.println("[PASS] isEmpty(\"👋\") = " + isEmpty5);
++        }
++
++        totalCount++;
++        boolean isNotEmpty1 = isNotEmpty(null);
++        if (isNotEmpty1)
++        {
++            failedCount++;
++            System.out.println("[FAIL] isNotEmpty(null) 期望 false，实际 " + isNotEmpty1);
++        }
++        else
++        {
++            System.out.println("[PASS] isNotEmpty(null) = " + isNotEmpty1);
++        }
++
++        totalCount++;
++        boolean isNotEmpty2 = isNotEmpty("");
++        if (isNotEmpty2)
++        {
++            failedCount++;
++            System.out.println("[FAIL] isNotEmpty(\"\") 期望 false，实际 " + isNotEmpty2);
++        }
++        else
++        {
++            System.out.println("[PASS] isNotEmpty(\"\") = " + isNotEmpty2);
++        }
++
++        totalCount++;
++        boolean isNotEmpty3 = isNotEmpty("hello");
++        if (!isNotEmpty3)
++        {
++            failedCount++;
++            System.out.println("[FAIL] isNotEmpty(\"hello\") 期望 true，实际 " + isNotEmpty3);
++        }
++        else
++        {
++            System.out.println("[PASS] isNotEmpty(\"hello\") = " + isNotEmpty3);
++        }
++
++        String substr1 = substring(null, 0);
++        totalCount++;
++        if (!"".equals(substr1))
++        {
++            failedCount++;
++            System.out.println("[FAIL] substring(null, 0) 期望 \"\"，实际 \"" + substr1 + "\"");
++        }
++        else
++        {
++            System.out.println("[PASS] substring(null, 0) = \"" + substr1 + "\"");
++        }
++
++        String substr2 = substring("hello", 1);
++        totalCount++;
++        if (!"ello".equals(substr2))
++        {
++            failedCount++;
++            System.out.println("[FAIL] substring(\"hello\", 1) 期望 \"ello\"，实际 \"" + substr2 + "\"");
++        }
++        else
++        {
++            System.out.println("[PASS] substring(\"hello\", 1) = \"" + substr2 + "\"");
++        }
++
++        String substr3 = substring("hello", -2);
++        totalCount++;
++        if (!"lo".equals(substr3))
++        {
++            failedCount++;
++            System.out.println("[FAIL] substring(\"hello\", -2) 期望 \"lo\"，实际 \"" + substr3 + "\"");
++        }
++        else
++        {
++            System.out.println("[PASS] substring(\"hello\", -2) = \"" + substr3 + "\"");
++        }
++
++        String substr4 = substring("hello", 10);
++        totalCount++;
++        if (!"".equals(substr4))
++        {
++            failedCount++;
++            System.out.println("[FAIL] substring(\"hello\", 10) 期望 \"\"，实际 \"" + substr4 + "\"");
++        }
++        else
++        {
++            System.out.println("[PASS] substring(\"hello\", 10) = \"" + substr4 + "\"");
++        }
++
++        String substr5 = substring(null, 0, 2);
++        totalCount++;
++        if (!"".equals(substr5))
++        {
++            failedCount++;
++            System.out.println("[FAIL] substring(null, 0, 2) 期望 \"\"，实际 \"" + substr5 + "\"");
++        }
++        else
++        {
++            System.out.println("[PASS] substring(null, 0, 2) = \"" + substr5 + "\"");
++        }
++
++        String substr6 = substring("你好世界", 1, 3);
++        totalCount++;
++        if (!"好世".equals(substr6))
++        {
++            failedCount++;
++            System.out.println("[FAIL] substring(\"你好世界\", 1, 3) 期望 \"好世\"，实际 \"" + substr6 + "\"");
++        }
++        else
++        {
++            System.out.println("[PASS] substring(\"你好世界\", 1, 3) = \"" + substr6 + "\"");
++        }
++
++        String substr7 = substring("👋🎉🎈", 0, 2);
++        totalCount++;
++        if (!"👋🎉".equals(substr7))
++        {
++            failedCount++;
++            System.out.println("[FAIL] substring(\"👋🎉🎈\", 0, 2) 期望 \"👋🎉\"，实际 \"" + substr7 + "\"");
++        }
++        else
++        {
++            System.out.println("[PASS] substring(\"👋🎉🎈\", 0, 2) = \"" + substr7 + "\"");
++        }
++
++        String substr8 = substring("hello你好👋", 3, -1);
++        totalCount++;
++        if (!"lo你好".equals(substr8))
++        {
++            failedCount++;
++            System.out.println("[FAIL] substring(\"hello你好👋\", 3, -1) 期望 \"lo你好\"，实际 \"" + substr8 + "\"");
++        }
++        else
++        {
++            System.out.println("[PASS] substring(\"hello你好👋\", 3, -1) = \"" + substr8 + "\"");
++        }
++
++        String format1 = format(null, "a", "b");
++        totalCount++;
++        if (format1 != null)
++        {
++            failedCount++;
++            System.out.println("[FAIL] format(null, \"a\", \"b\") 期望 null，实际 \"" + format1 + "\"");
++        }
++        else
++        {
++            System.out.println("[PASS] format(null, \"a\", \"b\") = " + format1);
++        }
++
++        String format2 = format("Hello {}, {}", null, "world");
++        totalCount++;
++        if (!"Hello null, world".equals(format2))
++        {
++            failedCount++;
++            System.out.println("[FAIL] format(\"Hello {}, {}\", null, \"world\") 期望 \"Hello null, world\"，实际 \"" + format2 + "\"");
++        }
++        else
++        {
++            System.out.println("[PASS] format(\"Hello {}, {}\", null, \"world\") = \"" + format2 + "\"");
++        }
++
++        String format3 = format("你好 {}, 👋{}", "世界", "欢迎");
++        totalCount++;
++        if (!"你好 世界, 👋欢迎".equals(format3))
++        {
++            failedCount++;
++            System.out.println("[FAIL] format(\"你好 {}, 👋{}\", \"世界\", \"欢迎\") 期望 \"你好 世界, 👋欢迎\"，实际 \"" + format3 + "\"");
++        }
++        else
++        {
++            System.out.println("[PASS] format(\"你好 {}, 👋{}\", \"世界\", \"欢迎\") = \"" + format3 + "\"");
++        }
++
++        System.out.println("==================== StringUtils 自检结束 ====================");
++        System.out.println("测试总数: " + totalCount);
++        System.out.println("失败总数: " + failedCount);
++        if (failedCount == 0)
++        {
++            System.out.println("✅ 所有测试通过！");
++        }
++        else
++        {
++            System.out.println("❌ 有 " + failedCount + " 个测试失败！");
++        }
++    }
+ }
