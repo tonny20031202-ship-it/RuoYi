@@ -1,0 +1,14 @@
+diff --git a/ruoyi-common/src/main/java/com/ruoyi/common/core/domain/AjaxResult.java b/ruoyi-common/src/main/java/com/ruoyi/common/core/domain/AjaxResult.java
+index 1f59cbcb..6993e23c 100644
+--- a/ruoyi-common/src/main/java/com/ruoyi/common/core/domain/AjaxResult.java
++++ b/ruoyi-common/src/main/java/com/ruoyi/common/core/domain/AjaxResult.java
+@@ -74,8 +74,7 @@ public class AjaxResult extends HashMap<String, Object>
+      */
+     public AjaxResult(Type type, String msg, Object data)
+     {
+-        super.put(CODE_TAG, type.value);
+-        super.put(MSG_TAG, msg);
++        this(type, msg);
+         if (StringUtils.isNotNull(data))
+         {
+             super.put(DATA_TAG, data);
