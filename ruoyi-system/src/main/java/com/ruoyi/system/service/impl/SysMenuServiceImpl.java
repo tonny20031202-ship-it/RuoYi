@@ -385,7 +385,12 @@ public class SysMenuServiceImpl implements ISysMenuService
             // 一、根据传入的某个父节点ID,遍历该父节点的所有子节点
             if (t.getParentId() == parentId)
             {
-                recursionFn(list, t);
+                // 检测原理：使用 Set 记录当前访问链上的菜单 ID。
+                // 每次递归前检查子节点 ID 是否已在 Set 中，若存在则说明发生了循环引用（例如父节点指向了子节点），
+                // 此时中断递归；否则将 ID 加入 Set 继续递归，并在回溯时移除，以保证不同分支正常检测。
+                Set<Long> visited = new HashSet<>();
+                visited.add(t.getMenuId());
+                recursionFn(list, t, visited);
                 returnList.add(t);
             }
         }
@@ -398,16 +403,30 @@ public class SysMenuServiceImpl implements ISysMenuService
      * @param list
      * @param t
      */
-    private void recursionFn(List<SysMenu> list, SysMenu t)
+    private void recursionFn(List<SysMenu> list, SysMenu t, Set<Long> visited)
     {
         // 得到子节点列表
         List<SysMenu> childList = getChildList(list, t);
+        
+        // 检查访问链，移除存在循环引用的子节点，防止序列化时出现死循环
+        Iterator<SysMenu> it = childList.iterator();
+        while (it.hasNext())
+        {
+            SysMenu child = it.next();
+            if (visited.contains(child.getMenuId()))
+            {
+                it.remove();
+            }
+        }
+        
         t.setChildren(childList);
         for (SysMenu tChild : childList)
         {
             if (hasChild(list, tChild))
             {
-                recursionFn(list, tChild);
+                visited.add(tChild.getMenuId());
+                recursionFn(list, tChild, visited);
+                visited.remove(tChild.getMenuId());
             }
         }
     }
