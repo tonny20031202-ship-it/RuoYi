@@ -1,0 +1,138 @@
+diff --git a/ruoyi-common/src/main/java/com/ruoyi/common/utils/StringUtils.java b/ruoyi-common/src/main/java/com/ruoyi/common/utils/StringUtils.java
+index 7aac7481..e9daef26 100644
+--- a/ruoyi-common/src/main/java/com/ruoyi/common/utils/StringUtils.java
++++ b/ruoyi-common/src/main/java/com/ruoyi/common/utils/StringUtils.java
+@@ -859,4 +859,133 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils
+         }
+         return sb.toString();
+     }
++
++    public static void main(String[] args)
++    {
++        int total = 0;
++        int failed = 0;
++        StringBuilder failures = new StringBuilder();
++        String emoji = "🙂";
++        String chinese = "中文测试";
++        String mixed = "中🙂文";
++
++        total++;
++        failed += selfCheck("isEmpty(null)", Boolean.TRUE, isEmpty((String) null), failures);
++        total++;
++        failed += selfCheck("isEmpty(\"\")", Boolean.TRUE, isEmpty(""), failures);
++        total++;
++        failed += selfCheck("isEmpty(空白)", Boolean.TRUE, isEmpty("   "), failures);
++        total++;
++        failed += selfCheck("isEmpty(emoji)", Boolean.FALSE, isEmpty(emoji), failures);
++        total++;
++        failed += selfCheck("isEmpty(中文)", Boolean.FALSE, isEmpty("中文"), failures);
++
++        total++;
++        failed += selfCheck("isNotEmpty(null)", Boolean.FALSE, isNotEmpty((String) null), failures);
++        total++;
++        failed += selfCheck("isNotEmpty(\"\")", Boolean.FALSE, isNotEmpty(""), failures);
++        total++;
++        failed += selfCheck("isNotEmpty(空白)", Boolean.FALSE, isNotEmpty(" \t "), failures);
++        total++;
++        failed += selfCheck("isNotEmpty(emoji)", Boolean.TRUE, isNotEmpty(emoji), failures);
++        total++;
++        failed += selfCheck("isNotEmpty(中文)", Boolean.TRUE, isNotEmpty("中文"), failures);
++
++        total++;
++        failed += selfCheck("substring(null, 0)", "", substring(null, 0), failures);
++        total++;
++        failed += selfCheck("substring(\"\", 0)", "", substring("", 0), failures);
++        total++;
++        failed += selfCheck("substring(abc, 5)", "", substring("abc", 5), failures);
++        total++;
++        failed += selfCheck("substring(abc, -5)", "abc", substring("abc", -5), failures);
++        total++;
++        failed += selfCheck("substring(中文测试, 1)", "文测试", substring(chinese, 1), failures);
++        total++;
++        failed += selfCheck("substring(中🙂文, 1)", mixed.substring(1), substring(mixed, 1), failures);
++
++        total++;
++        failed += selfCheck("substring(null, 0, 1)", "", substring(null, 0, 1), failures);
++        total++;
++        failed += selfCheck("substring(\"\", 0, 1)", "", substring("", 0, 1), failures);
++        total++;
++        failed += selfCheck("substring(abc, 2, 1)", "", substring("abc", 2, 1), failures);
++        total++;
++        failed += selfCheck("substring(abc, -5, 2)", "ab", substring("abc", -5, 2), failures);
++        total++;
++        failed += selfCheck("substring(中文测试, -2, -1)", "测", substring(chinese, -2, -1), failures);
++        total++;
++        failed += selfCheck("substring(🙂, 0, 1)", emoji.substring(0, 1), substring(emoji, 0, 1), failures);
++
++        total++;
++        failed += selfCheck("format(null, \"x\")", null, format(null, "x"), failures);
++        total++;
++        failed += selfCheck("format(\"\", \"x\")", "", format("", "x"), failures);
++        total++;
++        failed += selfCheck("format(无参数)", "无参数", format("无参数"), failures);
++        total++;
++        failed += selfCheck("format(null 参数)", "null", format("{}", (Object) null), failures);
++        total++;
++        failed += selfCheck("format(中文)", "你好，世界", format("你好，{}", "世界"), failures);
++        total++;
++        failed += selfCheck("format(emoji)", "emoji 🙂", format("emoji {}", emoji), failures);
++        total++;
++        failed += selfCheck("format(多字节)", "截断 中🙂文", format("截断 {}", mixed), failures);
++
++        System.out.println("StringUtils 自检完成，总数=" + total + "，成功=" + (total - failed) + "，失败=" + failed);
++        if (failed > 0)
++        {
++            System.out.print(failures.toString());
++        }
++    }
++
++    private static int selfCheck(String name, Object expected, Object actual, StringBuilder failures)
++    {
++        if (expected == actual || (expected != null && expected.equals(actual)))
++        {
++            return 0;
++        }
++        failures.append("FAIL ").append(name).append(" expected=").append(selfCheckValue(expected)).append(" actual=")
++                .append(selfCheckValue(actual)).append(System.lineSeparator());
++        return 1;
++    }
++
++    private static String selfCheckValue(Object value)
++    {
++        if (value == null)
++        {
++            return "null";
++        }
++        if (value instanceof String)
++        {
++            String str = (String) value;
++            return '"' + str + '"' + "(length=" + str.length() + ", codePoints=" + str.codePointCount(0, str.length())
++                    + ", units=" + selfCheckUnits(str) + ')';
++        }
++        return String.valueOf(value);
++    }
++
++    private static String selfCheckUnits(String str)
++    {
++        if (str.isEmpty())
++        {
++            return "[]";
++        }
++        StringBuilder sb = new StringBuilder("[");
++        for (int i = 0; i < str.length(); i++)
++        {
++            if (i > 0)
++            {
++                sb.append(' ');
++            }
++            String hex = Integer.toHexString(str.charAt(i)).toUpperCase();
++            for (int j = hex.length(); j < 4; j++)
++            {
++                sb.append('0');
++            }
++            sb.append(hex);
++        }
++        sb.append(']');
++        return sb.toString();
++    }
+ }
