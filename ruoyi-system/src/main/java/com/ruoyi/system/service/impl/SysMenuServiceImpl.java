@@ -385,7 +385,8 @@ public class SysMenuServiceImpl implements ISysMenuService
             // 一、根据传入的某个父节点ID,遍历该父节点的所有子节点
             if (t.getParentId() == parentId)
             {
-                recursionFn(list, t);
+                // 每个顶层节点使用独立的 visited 集合，避免不同顶层分支之间互相干扰
+                recursionFn(list, t, new HashSet<>());
                 returnList.add(t);
             }
         }
@@ -393,13 +394,28 @@ public class SysMenuServiceImpl implements ISysMenuService
     }
 
     /**
-     * 递归列表
+     * 递归构建菜单子树
      * 
-     * @param list
-     * @param t
+     * 循环引用检测原理：
+     * 使用 HashSet&lt;Long&gt; visited 记录当前递归路径（从根到当前节点）上所有已访问的菜单ID。
+     * 在递归进入子节点前，先检查该子节点ID是否已在 visited 中：
+     * - 若存在：说明父菜单的 parentId 错误指向了某个祖先节点，形成了 A→B→...→A 的环路，
+     *   此时直接 return 中断递归，防止 StackOverflowError。
+     * - 若不存在：将当前菜单ID加入 visited，继续递归处理其子节点；递归返回前移除当前ID，
+     *   确保不同子树分支之间的检测互不干扰（同一节点可能作为不同分支的子节点合法出现）。
+     * 
+     * @param list 全部菜单列表
+     * @param t 当前处理的菜单节点
+     * @param visited 当前递归路径上已访问的菜单ID集合，用于环路检测
      */
-    private void recursionFn(List<SysMenu> list, SysMenu t)
+    private void recursionFn(List<SysMenu> list, SysMenu t, Set<Long> visited)
     {
+        // 环路检测：若当前菜单ID已存在于访问链中，说明父菜单形成了循环引用，中断递归
+        if (visited.contains(t.getMenuId()))
+        {
+            return;
+        }
+        visited.add(t.getMenuId());
         // 得到子节点列表
         List<SysMenu> childList = getChildList(list, t);
         t.setChildren(childList);
@@ -407,9 +423,11 @@ public class SysMenuServiceImpl implements ISysMenuService
         {
             if (hasChild(list, tChild))
             {
-                recursionFn(list, tChild);
+                recursionFn(list, tChild, visited);
             }
         }
+        // 当前节点处理完毕，从访问链中移除，避免影响其他兄弟分支的检测
+        visited.remove(t.getMenuId());
     }
 
     /**
