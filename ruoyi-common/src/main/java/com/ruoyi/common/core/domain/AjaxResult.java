@@ -61,8 +61,7 @@ public class AjaxResult extends HashMap<String, Object>
      */
     public AjaxResult(Type type, String msg)
     {
-        super.put(CODE_TAG, type.value);
-        super.put(MSG_TAG, msg);
+        putResult(type.value, msg, null);
     }
 
     /**
@@ -74,7 +73,12 @@ public class AjaxResult extends HashMap<String, Object>
      */
     public AjaxResult(Type type, String msg, Object data)
     {
-        super.put(CODE_TAG, type.value);
+        putResult(type.value, msg, data);
+    }
+
+    private void putResult(int code, String msg, Object data)
+    {
+        super.put(CODE_TAG, code);
         super.put(MSG_TAG, msg);
         if (StringUtils.isNotNull(data))
         {
