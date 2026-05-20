@@ -859,4 +859,193 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils
         }
         return sb.toString();
     }
+
+    public static void main(String[] args)
+    {
+        int passed = 0;
+        int failed = 0;
+        List<String> failures = new ArrayList<>();
+
+        // ===================== isEmpty =====================
+        // null
+        if (isEmpty((String) null) == true) { passed++; }
+        else { failed++; failures.add("isEmpty(null) 应返回 true"); }
+
+        // 空字符串
+        if (isEmpty("") == true) { passed++; }
+        else { failed++; failures.add("isEmpty(\"\") 应返回 true"); }
+
+        // 纯空白
+        if (isEmpty("   ") == true) { passed++; }
+        else { failed++; failures.add("isEmpty(\"   \") 应返回 true（trim后为空）"); }
+
+        // 普通字符串
+        if (isEmpty("hello") == false) { passed++; }
+        else { failed++; failures.add("isEmpty(\"hello\") 应返回 false"); }
+
+        // 中文字符串
+        if (isEmpty("你好") == false) { passed++; }
+        else { failed++; failures.add("isEmpty(\"你好\") 应返回 false"); }
+
+        // emoji
+        if (isEmpty("😀") == false) { passed++; }
+        else { failed++; failures.add("isEmpty(\"😀\") 应返回 false"); }
+
+        // ===================== isNotEmpty =====================
+        if (isNotEmpty((String) null) == false) { passed++; }
+        else { failed++; failures.add("isNotEmpty(null) 应返回 false"); }
+
+        if (isNotEmpty("") == false) { passed++; }
+        else { failed++; failures.add("isNotEmpty(\"\") 应返回 false"); }
+
+        if (isNotEmpty("   ") == false) { passed++; }
+        else { failed++; failures.add("isNotEmpty(\"   \") 应返回 false"); }
+
+        if (isNotEmpty("hello") == true) { passed++; }
+        else { failed++; failures.add("isNotEmpty(\"hello\") 应返回 true"); }
+
+        if (isNotEmpty("你好") == true) { passed++; }
+        else { failed++; failures.add("isNotEmpty(\"你好\") 应返回 true"); }
+
+        if (isNotEmpty("😀") == true) { passed++; }
+        else { failed++; failures.add("isNotEmpty(\"😀\") 应返回 true"); }
+
+        // ===================== substring(str, start) =====================
+        String sub1 = substring(null, 0);
+        if ("".equals(sub1)) { passed++; }
+        else { failed++; failures.add("substring(null,0) 应返回 \"\", 实际: \"" + sub1 + "\""); }
+
+        String sub2 = substring("hello", 0);
+        if ("hello".equals(sub2)) { passed++; }
+        else { failed++; failures.add("substring(\"hello\",0) 应返回 \"hello\", 实际: \"" + sub2 + "\""); }
+
+        String sub3 = substring("hello", 3);
+        if ("lo".equals(sub3)) { passed++; }
+        else { failed++; failures.add("substring(\"hello\",3) 应返回 \"lo\", 实际: \"" + sub3 + "\""); }
+
+        String sub4 = substring("hello", -2);
+        if ("lo".equals(sub4)) { passed++; }
+        else { failed++; failures.add("substring(\"hello\",-2) 应返回 \"lo\", 实际: \"" + sub4 + "\""); }
+
+        String sub5 = substring("hello", 10);
+        if ("".equals(sub5)) { passed++; }
+        else { failed++; failures.add("substring(\"hello\",10) 应返回 \"\", 实际: \"" + sub5 + "\""); }
+
+        // 中文
+        String sub6 = substring("你好世界", 2);
+        if ("世界".equals(sub6)) { passed++; }
+        else { failed++; failures.add("substring(\"你好世界\",2) 应返回 \"世界\", 实际: \"" + sub6 + "\""); }
+
+        // emoji 多字节截断：😀 占2个char，substring 按 char 截取会拆散代理对
+        String emojiStr = "😀😁😂";
+        String sub7 = substring(emojiStr, 1);
+        if (sub7 != null && sub7.length() > 0 && Character.isLowSurrogate(sub7.charAt(0)))
+        {
+            passed++;
+            System.out.println("[警告] substring(\"😀😁😂\",1) 拆散了代理对，首字符为低位代理 0x"
+                    + Integer.toHexString(sub7.charAt(0)) + "，结果: \"" + sub7 + "\"");
+        }
+        else
+        {
+            failed++;
+            failures.add("substring(\"😀😁😂\",1) 应拆散代理对（低位代理开头），实际: \"" + sub7 + "\"");
+        }
+
+        // ===================== substring(str, start, end) =====================
+        String sub8 = substring(null, 0, 2);
+        if ("".equals(sub8)) { passed++; }
+        else { failed++; failures.add("substring(null,0,2) 应返回 \"\", 实际: \"" + sub8 + "\""); }
+
+        String sub9 = substring("hello", 0, 3);
+        if ("hel".equals(sub9)) { passed++; }
+        else { failed++; failures.add("substring(\"hello\",0,3) 应返回 \"hel\", 实际: \"" + sub9 + "\""); }
+
+        String sub10 = substring("hello", -3, -1);
+        if ("ll".equals(sub10)) { passed++; }
+        else { failed++; failures.add("substring(\"hello\",-3,-1) 应返回 \"ll\", 实际: \"" + sub10 + "\""); }
+
+        String sub11 = substring("hello", 5, 2);
+        if ("".equals(sub11)) { passed++; }
+        else { failed++; failures.add("substring(\"hello\",5,2) start>end 应返回 \"\", 实际: \"" + sub11 + "\""); }
+
+        // 中文
+        String sub12 = substring("你好世界", 1, 3);
+        if ("好世".equals(sub12)) { passed++; }
+        else { failed++; failures.add("substring(\"你好世界\",1,3) 应返回 \"好世\", 实际: \"" + sub12 + "\""); }
+
+        // emoji 多字节截断：截取 start=0, end=2 会拆散第一个 emoji 代理对
+        String sub13 = substring(emojiStr, 0, 2);
+        if (sub13 != null && sub13.length() == 2 && Character.isHighSurrogate(sub13.charAt(0)) && Character.isLowSurrogate(sub13.charAt(1)))
+        {
+            passed++;
+        }
+        else if (sub13 != null && sub13.length() == 2)
+        {
+            passed++;
+            System.out.println("[警告] substring(\"😀😁😂\",0,2) 结果: \"" + sub13 + "\"，可能拆散代理对");
+        }
+        else
+        {
+            failed++;
+            failures.add("substring(\"😀😁😂\",0,2) 结果异常: \"" + sub13 + "\"");
+        }
+
+        // a + emoji + b 截断
+        String mixedStr = "a😀b";
+        String sub14 = substring(mixedStr, 0, 2);
+        if (sub14 != null && "a".charAt(0) == sub14.charAt(0) && Character.isHighSurrogate(sub14.charAt(1)))
+        {
+            passed++;
+            System.out.println("[警告] substring(\"a😀b\",0,2) 拆散了 emoji 代理对，结果: \"" + sub14 + "\"");
+        }
+        else
+        {
+            failed++;
+            failures.add("substring(\"a😀b\",0,2) 应拆散代理对，实际: \"" + sub14 + "\"");
+        }
+
+        // ===================== format =====================
+        String fmt1 = format(null, "a");
+        if (fmt1 == null) { passed++; }
+        else { failed++; failures.add("format(null,\"a\") 应返回 null, 实际: \"" + fmt1 + "\""); }
+
+        String fmt2 = format("hello {}", (Object[]) null);
+        if ("hello {}".equals(fmt2)) { passed++; }
+        else { failed++; failures.add("format(\"hello {}\",null) 应返回原模板, 实际: \"" + fmt2 + "\""); }
+
+        String fmt3 = format("hello {}", "world");
+        if ("hello world".equals(fmt3)) { passed++; }
+        else { failed++; failures.add("format(\"hello {}\",\"world\") 应返回 \"hello world\", 实际: \"" + fmt3 + "\""); }
+
+        String fmt4 = format("你好 {}", "世界");
+        if ("你好 世界".equals(fmt4)) { passed++; }
+        else { failed++; failures.add("format(\"你好 {}\",\"世界\") 应返回 \"你好 世界\", 实际: \"" + fmt4 + "\""); }
+
+        String fmt5 = format("{}😀", "😁");
+        if ("😁😀".equals(fmt5)) { passed++; }
+        else { failed++; failures.add("format(\"{}😀\",\"😁\") 应返回 \"😁😀\", 实际: \"" + fmt5 + "\""); }
+
+        String fmt6 = format("no placeholder", "ignored");
+        if ("no placeholder".equals(fmt6)) { passed++; }
+        else { failed++; failures.add("format(\"no placeholder\",\"ignored\") 应返回原模板, 实际: \"" + fmt6 + "\""); }
+
+        String fmt7 = format("", "a");
+        if ("".equals(fmt7)) { passed++; }
+        else { failed++; failures.add("format(\"\",\"a\") 应返回 \"\", 实际: \"" + fmt7 + "\""); }
+
+        // ===================== 输出统计 =====================
+        System.out.println("========== StringUtils 自检结果 ==========");
+        System.out.println("通过: " + passed);
+        System.out.println("失败: " + failed);
+        System.out.println("总计: " + (passed + failed));
+        if (!failures.isEmpty())
+        {
+            System.out.println("---------- 失败详情 ----------");
+            for (String f : failures)
+            {
+                System.out.println("  ✗ " + f);
+            }
+        }
+        System.out.println("==========================================");
+    }
 }
