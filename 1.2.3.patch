@@ -1,0 +1,247 @@
+diff --git a/ruoyi-common/src/main/java/com/ruoyi/common/utils/StringUtils.java b/ruoyi-common/src/main/java/com/ruoyi/common/utils/StringUtils.java
+index 7aac7481..c5ca33e7 100644
+--- a/ruoyi-common/src/main/java/com/ruoyi/common/utils/StringUtils.java
++++ b/ruoyi-common/src/main/java/com/ruoyi/common/utils/StringUtils.java
+@@ -859,4 +859,242 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils
+         }
+         return sb.toString();
+     }
++
++    public static void main(String[] args)
++    {
++        int passed = 0;
++        int failed = 0;
++
++        // ========== isEmpty / isNotEmpty ==========
++        System.out.println("=== isEmpty / isNotEmpty ===");
++
++        // null
++        if (isEmpty((String) null) && !isNotEmpty((String) null)) { passed++; System.out.println("  PASS isEmpty(null)=true, isNotEmpty(null)=false"); }
++        else { failed++; System.out.println("  FAIL isEmpty(null)/isNotEmpty(null)"); }
++
++        // empty string
++        if (isEmpty("") && !isNotEmpty("")) { passed++; System.out.println("  PASS isEmpty(\"\")=true, isNotEmpty(\"\")=false"); }
++        else { failed++; System.out.println("  FAIL isEmpty(\"\")/isNotEmpty(\"\")"); }
++
++        // whitespace string
++        if (isEmpty("   ") && !isNotEmpty("   ")) { passed++; System.out.println("  PASS isEmpty(\"   \")=true, isNotEmpty(\"   \")=false"); }
++        else { failed++; System.out.println("  FAIL isEmpty(\"   \")/isNotEmpty(\"   \")"); }
++
++        // normal string
++        if (!isEmpty("abc") && isNotEmpty("abc")) { passed++; System.out.println("  PASS isEmpty(\"abc\")=false, isNotEmpty(\"abc\")=true"); }
++        else { failed++; System.out.println("  FAIL isEmpty(\"abc\")/isNotEmpty(\"abc\")"); }
++
++        // Chinese
++        if (!isEmpty("中文") && isNotEmpty("中文")) { passed++; System.out.println("  PASS isEmpty(\"中文\")=false, isNotEmpty(\"中文\")=true"); }
++        else { failed++; System.out.println("  FAIL isEmpty(\"中文\")/isNotEmpty(\"中文\")"); }
++
++        // emoji
++        if (!isEmpty("😀") && isNotEmpty("😀")) { passed++; System.out.println("  PASS isEmpty(\"😀\")=false, isNotEmpty(\"😀\")=true"); }
++        else { failed++; System.out.println("  FAIL isEmpty(\"😀\")/isNotEmpty(\"😀\")"); }
++
++        // Chinese with whitespace
++        if (!isEmpty("  你好  ") && isNotEmpty("  你好  ")) { passed++; System.out.println("  PASS isEmpty(\"  你好  \")=false, isNotEmpty(\"  你好  \")=true"); }
++        else { failed++; System.out.println("  FAIL isEmpty(\"  你好  \")/isNotEmpty(\"  你好  \")"); }
++
++        // emoji with whitespace
++        if (!isEmpty("  😀  ") && isNotEmpty("  😀  ")) { passed++; System.out.println("  PASS isEmpty(\"  😀  \")=false, isNotEmpty(\"  😀  \")=true"); }
++        else { failed++; System.out.println("  FAIL isEmpty(\"  😀  \")/isNotEmpty(\"  😀  \")"); }
++
++        // ========== substring(str, start) ==========
++        System.out.println("\n=== substring(str, start) ===");
++
++        // null
++        if ("".equals(substring(null, 0))) { passed++; System.out.println("  PASS substring(null, 0)=\"\""); }
++        else { failed++; System.out.println("  FAIL substring(null, 0) expected \"\", got \"" + substring(null, 0) + "\""); }
++
++        // empty string
++        if ("".equals(substring("", 0))) { passed++; System.out.println("  PASS substring(\"\", 0)=\"\""); }
++        else { failed++; System.out.println("  FAIL substring(\"\", 0) expected \"\", got \"" + substring("", 0) + "\""); }
++
++        // normal start=0
++        if ("abc".equals(substring("abc", 0))) { passed++; System.out.println("  PASS substring(\"abc\", 0)=\"abc\""); }
++        else { failed++; System.out.println("  FAIL substring(\"abc\", 0) expected \"abc\", got \"" + substring("abc", 0) + "\""); }
++
++        // normal start>0
++        if ("bc".equals(substring("abc", 1))) { passed++; System.out.println("  PASS substring(\"abc\", 1)=\"bc\""); }
++        else { failed++; System.out.println("  FAIL substring(\"abc\", 1) expected \"bc\", got \"" + substring("abc", 1) + "\""); }
++
++        // negative start
++        if ("c".equals(substring("abc", -1))) { passed++; System.out.println("  PASS substring(\"abc\", -1)=\"c\""); }
++        else { failed++; System.out.println("  FAIL substring(\"abc\", -1) expected \"c\", got \"" + substring("abc", -1) + "\""); }
++
++        // negative start beyond length
++        if ("abc".equals(substring("abc", -100))) { passed++; System.out.println("  PASS substring(\"abc\", -100)=\"abc\""); }
++        else { failed++; System.out.println("  FAIL substring(\"abc\", -100) expected \"abc\", got \"" + substring("abc", -100) + "\""); }
++
++        // start beyond length
++        if ("".equals(substring("abc", 100))) { passed++; System.out.println("  PASS substring(\"abc\", 100)=\"\""); }
++        else { failed++; System.out.println("  FAIL substring(\"abc\", 100) expected \"\", got \"" + substring("abc", 100) + "\""); }
++
++        // Chinese: "中文测试", start=2 -> "测试"
++        if ("测试".equals(substring("中文测试", 2))) { passed++; System.out.println("  PASS substring(\"中文测试\", 2)=\"测试\""); }
++        else { failed++; System.out.println("  FAIL substring(\"中文测试\", 2) expected \"测试\", got \"" + substring("中文测试", 2) + "\""); }
++
++        // Chinese: negative start
++        if ("测试".equals(substring("中文测试", -2))) { passed++; System.out.println("  PASS substring(\"中文测试\", -2)=\"测试\""); }
++        else { failed++; System.out.println("  FAIL substring(\"中文测试\", -2) expected \"测试\", got \"" + substring("中文测试", -2) + "\""); }
++
++        // emoji: "😀😁😂", start=0 -> "😀😁😂"
++        if ("😀😁😂".equals(substring("😀😁😂", 0))) { passed++; System.out.println("  PASS substring(\"😀😁😂\", 0)=\"😀😁😂\""); }
++        else { failed++; System.out.println("  FAIL substring(\"😀😁😂\", 0) expected \"😀😁😂\", got \"" + substring("😀😁😂", 0) + "\""); }
++
++        // emoji: "😀😁😂", start=2 -> "😂" (each emoji = 2 Java chars)
++        if ("😂".equals(substring("😀😁😂", 2))) { passed++; System.out.println("  PASS substring(\"😀😁😂\", 2)=\"😂\""); }
++        else { failed++; System.out.println("  FAIL substring(\"😀😁😂\", 2) expected \"😂\", got \"" + substring("😀😁😂", 2) + "\""); }
++
++        // multi-byte truncation: "a😀b", start=1 -> "😀b" (position 1 splits surrogate pair)
++        {
++            String result = substring("a😀b", 1);
++            String expected = "😀b";
++            if (expected.equals(result)) { passed++; System.out.println("  PASS substring(\"a😀b\", 1)=\"😀b\" (emoji intact)"); }
++            else { failed++; System.out.println("  FAIL substring(\"a😀b\", 1) surrogate split, expected \"" + expected + "\", got \"" + result + "\" (len=" + result.length() + ")"); }
++        }
++
++        // ========== substring(str, start, end) ==========
++        System.out.println("\n=== substring(str, start, end) ===");
++
++        // null
++        if ("".equals(substring(null, 0, 1))) { passed++; System.out.println("  PASS substring(null, 0, 1)=\"\""); }
++        else { failed++; System.out.println("  FAIL substring(null, 0, 1) expected \"\", got \"" + substring(null, 0, 1) + "\""); }
++
++        // empty string
++        if ("".equals(substring("", 0, 0))) { passed++; System.out.println("  PASS substring(\"\", 0, 0)=\"\""); }
++        else { failed++; System.out.println("  FAIL substring(\"\", 0, 0) expected \"\", got \"" + substring("", 0, 0) + "\""); }
++
++        // normal range
++        if ("ab".equals(substring("abc", 0, 2))) { passed++; System.out.println("  PASS substring(\"abc\", 0, 2)=\"ab\""); }
++        else { failed++; System.out.println("  FAIL substring(\"abc\", 0, 2) expected \"ab\", got \"" + substring("abc", 0, 2) + "\""); }
++
++        // negative indices
++        if ("b".equals(substring("abc", -2, -1))) { passed++; System.out.println("  PASS substring(\"abc\", -2, -1)=\"b\""); }
++        else { failed++; System.out.println("  FAIL substring(\"abc\", -2, -1) expected \"b\", got \"" + substring("abc", -2, -1) + "\""); }
++
++        // start > end
++        if ("".equals(substring("hello", 3, 1))) { passed++; System.out.println("  PASS substring(\"hello\", 3, 1)=\"\""); }
++        else { failed++; System.out.println("  FAIL substring(\"hello\", 3, 1) expected \"\", got \"" + substring("hello", 3, 1) + "\""); }
++
++        // end beyond length
++        if ("abc".equals(substring("abc", 0, 100))) { passed++; System.out.println("  PASS substring(\"abc\", 0, 100)=\"abc\""); }
++        else { failed++; System.out.println("  FAIL substring(\"abc\", 0, 100) expected \"abc\", got \"" + substring("abc", 0, 100) + "\""); }
++
++        // start=end
++        if ("".equals(substring("abc", 1, 1))) { passed++; System.out.println("  PASS substring(\"abc\", 1, 1)=\"\""); }
++        else { failed++; System.out.println("  FAIL substring(\"abc\", 1, 1) expected \"\", got \"" + substring("abc", 1, 1) + "\""); }
++
++        // Chinese: "中文测试", 0, 2 -> "中文"
++        if ("中文".equals(substring("中文测试", 0, 2))) { passed++; System.out.println("  PASS substring(\"中文测试\", 0, 2)=\"中文\""); }
++        else { failed++; System.out.println("  FAIL substring(\"中文测试\", 0, 2) expected \"中文\", got \"" + substring("中文测试", 0, 2) + "\""); }
++
++        // Chinese: negative range
++        if ("文测".equals(substring("中文测试", -3, -1))) { passed++; System.out.println("  PASS substring(\"中文测试\", -3, -1)=\"文测\""); }
++        else { failed++; System.out.println("  FAIL substring(\"中文测试\", -3, -1) expected \"文测\", got \"" + substring("中文测试", -3, -1) + "\""); }
++
++        // emoji: "😀😁😂", 0, 2 -> "😀" (first complete emoji)
++        if ("😀".equals(substring("😀😁😂", 0, 2))) { passed++; System.out.println("  PASS substring(\"😀😁😂\", 0, 2)=\"😀\" (emoji intact)"); }
++        else { failed++; System.out.println("  FAIL substring(\"😀😁😂\", 0, 2) expected \"😀\", got \"" + substring("😀😁😂", 0, 2) + "\""); }
++
++        // multi-byte truncation: "😀😁😂", 0, 1 -> half emoji (surrogate split)
++        {
++            String result = substring("😀😁😂", 0, 1);
++            // Verify it IS a broken surrogate: result.length() should be 1 and it should be a lone high surrogate
++            if (result.length() == 1 && Character.isHighSurrogate(result.charAt(0)))
++            {
++                passed++;
++                System.out.println("  PASS substring(\"😀😁😂\", 0, 1)=half-emoji (detected surrogate split, len=1)");
++            }
++            else
++            {
++                failed++;
++                System.out.println("  FAIL substring(\"😀😁😂\", 0, 1) expected surrogate split, got len=" + result.length() + " chars=\"" + result + "\"");
++            }
++        }
++
++        // multi-byte truncation: "a😀b", 0, 2 -> "a" + half emoji
++        {
++            String result = substring("a😀b", 0, 2);
++            if (result.length() == 2 && result.charAt(0) == 'a' && Character.isHighSurrogate(result.charAt(1)))
++            {
++                passed++;
++                System.out.println("  PASS substring(\"a😀b\", 0, 2) detected surrogate partial split (a + high surrogate)");
++            }
++            else
++            {
++                failed++;
++                System.out.println("  FAIL substring(\"a😀b\", 0, 2) expected a+highSurrogate, got len=" + result.length());
++            }
++        }
++
++        // multi-byte truncation: mixed Chinese + emoji "中😀国", 0, 2 -> "中" + half emoji
++        {
++            String result = substring("中😀国", 0, 2);
++            if (result.length() == 2 && result.charAt(0) == '中' && Character.isHighSurrogate(result.charAt(1)))
++            {
++                passed++;
++                System.out.println("  PASS substring(\"中😀国\", 0, 2) detected surrogate split (中+highSurrogate)");
++            }
++            else
++            {
++                failed++;
++                System.out.println("  FAIL substring(\"中😀国\", 0, 2) expected split, got len=" + result.length());
++            }
++        }
++
++        // ========== format ==========
++        System.out.println("\n=== format ===");
++
++        // null template
++        if (null == format(null, "a")) { passed++; System.out.println("  PASS format(null, \"a\")=null"); }
++        else { failed++; System.out.println("  FAIL format(null, \"a\") expected null, got \"" + format(null, "a") + "\""); }
++
++        // empty template
++        if ("".equals(format("", "a"))) { passed++; System.out.println("  PASS format(\"\", \"a\")=\"\""); }
++        else { failed++; System.out.println("  FAIL format(\"\", \"a\") expected \"\", got \"" + format("", "a") + "\""); }
++
++        // null params
++        if ("hello".equals(format("hello", (Object[]) null))) { passed++; System.out.println("  PASS format(\"hello\", null) preserves template"); }
++        else { failed++; System.out.println("  FAIL format(\"hello\", null) expected \"hello\", got \"" + format("hello", (Object[]) null) + "\""); }
++
++        // empty params
++        if ("hello".equals(format("hello"))) { passed++; System.out.println("  PASS format(\"hello\") preserves template (no params)"); }
++        else { failed++; System.out.println("  FAIL format(\"hello\") expected \"hello\", got \"" + format("hello") + "\""); }
++
++        // normal format
++        if ("hello world".equals(format("{} {}", "hello", "world"))) { passed++; System.out.println("  PASS format(\"{} {}\", \"hello\", \"world\")=\"hello world\""); }
++        else { failed++; System.out.println("  FAIL format(\"{} {}\", \"hello\", \"world\"): got \"" + format("{} {}", "hello", "world") + "\""); }
++
++        // format with Chinese
++        if ("你好 世界".equals(format("{} {}", "你好", "世界"))) { passed++; System.out.println("  PASS format(\"{} {}\", \"你好\", \"世界\")=\"你好 世界\""); }
++        else { failed++; System.out.println("  FAIL format with Chinese: got \"" + format("{} {}", "你好", "世界") + "\""); }
++
++        // format with emoji
++        if ("😀 😁".equals(format("{} {}", "😀", "😁"))) { passed++; System.out.println("  PASS format(\"{} {}\", \"😀\", \"😁\")=\"😀 😁\""); }
++        else { failed++; System.out.println("  FAIL format with emoji: got \"" + format("{} {}", "😀", "😁") + "\""); }
++
++        // format with mixed Chinese + emoji
++        if ("你好😀世界".equals(format("{}{}{}", "你好", "😀", "世界"))) { passed++; System.out.println("  PASS format(\"{}{}{}\", \"你好\", \"😀\", \"世界\")=\"你好😀世界\""); }
++        else { failed++; System.out.println("  FAIL format mixed: got \"" + format("{}{}{}", "你好", "😀", "世界") + "\""); }
++
++        // template with no placeholders
++        if ("no placeholders".equals(format("no placeholders", "a", "b"))) { passed++; System.out.println("  PASS format(\"no placeholders\", \"a\", \"b\")=\"no placeholders\""); }
++        else { failed++; System.out.println("  FAIL format no placeholders: got \"" + format("no placeholders", "a", "b") + "\""); }
++
++        // template with escaped braces via StrFormatter
++        System.out.println("  INFO format(\"this is \\\\{} for {}\", \"a\", \"b\")=\"" + format("this is \\{} for {}", "a", "b") + "\"");
++
++        // ========== Summary ==========
++        int total = passed + failed;
++        System.out.println("\n============================================");
++        System.out.println("  Self-check completed.");
++        System.out.println("  Total: " + total + ", Passed: " + passed + ", Failed: " + failed);
++        System.out.println("============================================");
++        if (failed > 0)
++        {
++            System.exit(1);
++        }
++    }
+ }
