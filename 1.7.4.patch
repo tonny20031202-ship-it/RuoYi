@@ -1,0 +1,19 @@
+diff --git a/ruoyi-common/src/main/java/com/ruoyi/common/core/domain/entity/SysMenu.java b/ruoyi-common/src/main/java/com/ruoyi/common/core/domain/entity/SysMenu.java
+index 71035128..d37ae7dc 100644
+--- a/ruoyi-common/src/main/java/com/ruoyi/common/core/domain/entity/SysMenu.java
++++ b/ruoyi-common/src/main/java/com/ruoyi/common/core/domain/entity/SysMenu.java
+@@ -183,12 +183,12 @@ public class SysMenu extends BaseEntity
+ 
+     public List<SysMenu> getChildren()
+     {
+-        return children;
++        return new ArrayList<>(children);
+     }
+ 
+     public void setChildren(List<SysMenu> children)
+     {
+-        this.children = children;
++        this.children = new ArrayList<>(children);
+     }
+ 
+     @Override

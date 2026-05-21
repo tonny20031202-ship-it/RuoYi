@@ -183,12 +183,12 @@ public class SysMenu extends BaseEntity
 
     public List<SysMenu> getChildren()
     {
-        return children;
+        return new ArrayList<>(children);
     }
 
     public void setChildren(List<SysMenu> children)
     {
-        this.children = children;
+        this.children = new ArrayList<>(children);
     }
 
     @Override
